@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mobile Chess App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/css/chessboard.min.css"/>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header, nav, main, footer {
+      padding: 1rem;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 0.7rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    #board {
+      width: 100%;
+      margin: 1rem auto;
+    }
+    .profile-info, .score-tracker {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h2>Chess App</h2>
+    </header>
+
+    <div class="section" id="loginSection">
+      <h3>Login</h3>
+      <input type="text" id="username" placeholder="Username"/>
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div class="section" id="profileSection" style="display:none;">
+      <div class="profile-info">
+        <strong>Player:</strong> <span id="playerName"></span><br/>
+        <strong>Score:</strong> <span id="playerScore">0</span>
+      </div>
+      <button onclick="startNewGame()">Start New Game</button>
+    </div>
+
+    <div class="section" id="chessSection" style="display:none;">
+      <div id="board"></div>
+      <p><strong>Status:</strong> <span id="status">Waiting for move...</span></p>
+    </div>
+
+    <div class="section" id="lessonsSection" style="display:none;">
+      <h3>Lessons</h3>
+      <p>Coming soon: Openings, tactics, endgames...</p>
+    </div>
+
+    <div class="section" id="explorerSection" style="display:none;">
+      <h3>Game Explorer</h3>
+      <p>Win chances by move (powered by Stockfish):</p>
+      <div id="evaluation">--</div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/js/chessboard.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stockfish/stockfish.wasm.js"></script>
+  <script>
+    let board, game = new Chess();
+    let engine = STOCKFISH();
+    let score = 0;
+
+    function login() {
+      const name = document.getElementById('username').value;
+      if (!name) return alert("Enter username");
+      document.getElementById('playerName').innerText = name;
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('profileSection').style.display = 'block';
+      document.getElementById('chessSection').style.display = 'block';
+      document.getElementById('lessonsSection').style.display = 'block';
+      document.getElementById('explorerSection').style.display = 'block';
+    }
+
+    function startNewGame() {
+      game.reset();
+      board.position(game.fen());
+      updateStatus();
+    }
+
+    function updateStatus() {
+      document.getElementById('status').innerText = game.turn() === 'w' ? "White to move" : "Black to move";
+      evaluateBoard();
+    }
+
+    function evaluateBoard() {
+      engine.postMessage("position fen " + game.fen());
+      engine.postMessage("eval");
+      engine.onmessage = function (line) {
+        if (typeof line === "string" && line.includes("Total evaluation")) {
+          document.getElementById("evaluation").innerText = line;
+        }
+      };
+    }
+
+    function onDrop(source, target) {
+      const move = game.move({ from: source, to: target, promotion: 'q' });
+      if (move === null) return 'snapback';
+      board.position(game.fen());
+      updateStatus();
+    }
+
+    const config = {
+      draggable: true,
+      position: 'start',
+      onDrop: onDrop,
+    };
+
+    board = Chessboard('board', config);
+  </script>
+</body>
+</html>
