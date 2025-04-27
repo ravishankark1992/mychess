@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chess App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/js/chessboard.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Login Form -->
+    <div id="loginSection">
+      <h2>Login</h2>
+      <input id="username" type="text" placeholder="Username">
+      <input id="password" type="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <p>or <a href="#" onclick="showSignup()">Sign Up</a></p>
+    </div>
+
+    <!-- Chess Game -->
+    <div id="gameSection" style="display:none;">
+      <h2>Welcome, <span id="playerName"></span>!</h2>
+      <div id="board" style="width: 100%;"></div>
+      <button onclick="startNewGame()">New Game</button>
+      <button onclick="loadLessons()">Lessons</button>
+      <button onclick="multiplayerLobby()">Multiplayer</button>
+    </div>
+
+    <!-- Lessons Section -->
+    <div id="lessonsSection" style="display:none;">
+      <h2>Chess Lessons</h2>
+      <div id="lessons"></div>
+    </div>
+
+    <!-- Multiplayer Section -->
+    <div id="multiplayerSection" style="display:none;">
+      <h2>Multiplayer</h2>
+      <input id="gameIdInput" placeholder="Enter Game ID or Create New">
+      <button onclick="createMultiplayer()">Create Game</button>
+      <button onclick="joinMultiplayer()">Join Game</button>
+    </div>
+  </div>
+
+<script src="app.js"></script>
+</body>
+</html>
