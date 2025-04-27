@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from backend.database import SessionLocal, engine
 from backend.models import Base, User, Game
-from backend.crud import create_user, authenticate_user, create_game
+from backend.crud import create_user, authenticate_user, create_game, save_game, get_games
 
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
 from backend.database import Base
+from typing import List
 
 class Game(Base):
     __tablename__ = "games"
@@ -39,3 +40,14 @@ def new_game():
 @app.get("/lessons")
 def get_lessons():
     return [{"title": "Control Center"}, {"title": "Develop Pieces"}]
+
+
+
+@app.post("/savegame")
+def save_game_api(player: str, opponent: str, result: str, moves: str):
+    return save_game(player, opponent, result, moves)
+
+@app.get("/history/{player}")
+def get_history(player: str):
+    games = get_games(player)
+    return [{"opponent": g.opponent, "result": g.result, "moves": g.moves, "date": g.created_at} for g in games]

@@ -29,3 +29,31 @@ function startNewGame() {
   game.reset();
   board.position('start');
 }
+
+function saveMatchHistory(opponent, result, moves) {
+    const token = localStorage.getItem('token');
+    fetch(`${API_URL}/savegame`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        player: localStorage.getItem('username'),
+        opponent: opponent,
+        result: result,
+        moves: moves
+      })
+    });
+  }
+
+function loadMatchHistory() {
+    const username = localStorage.getItem('username');
+    fetch(`${API_URL}/history/${username}`)
+    .then(res => res.json())
+    .then(games => {
+    const historyDiv = document.getElementById('historySection');
+    historyDiv.innerHTML = '<h2>Your Match History</h2>';
+    games.forEach(g => {
+        historyDiv.innerHTML += `<div>${g.date}: vs ${g.opponent} - ${g.result}</div>`;
+    });
+    });
+}
+  

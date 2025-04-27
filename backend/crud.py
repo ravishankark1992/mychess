@@ -19,3 +19,13 @@ def create_game():
     db.commit()
     db.refresh(game)
     return game
+
+def save_game(player: str, opponent: str, result: str, moves: str):
+    game = Game(player=player, opponent=opponent, result=result, moves=moves)
+    db.add(game)
+    db.commit()
+    db.refresh(game)
+    return game
+
+def get_games(player: str):
+    return db.query(Game).filter(Game.player == player).order_by(Game.created_at.desc()).all()
